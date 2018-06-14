@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 
 import Burger from '../../components/Burger/Burger';
 import BuildControls from '../../components/Burger/BuildControls/BuildControls';
+import Modal from '../../components/UI/Modal/Modal';
+import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary';
 
 const INGREDIENT_PRICES = {
   cheese: 0.4,
@@ -19,13 +21,17 @@ class BurgerBuilder extends Component {
       meat: 0
     },
     totalPrice: 0,
-    purchasable: false
+    purchasable: false,
+    purchasing: false
   };
 
   updatePurchasableState = ingredients => {
-    const sum = Object.keys(ingredients).reduce((val, el) => val + ingredients[el], 0);
+    const sum = Object.keys(ingredients).reduce(
+      (val, el) => val + ingredients[el],
+      0
+    );
     this.setState({ purchasable: sum > 0 });
-  }
+  };
 
   increaseIngredient = title => {
     const ingredients = {
@@ -48,17 +54,38 @@ class BurgerBuilder extends Component {
     this.updatePurchasableState(ingredients);
   };
 
+  showPurchasingModal = () => {
+    this.setState({ purchasing: true });
+  };
+
+  cancelPurchaseModal = () => {
+    this.setState({ purchasing: false });
+  };
+
+  continuePurchase = () => {
+    alert('You continue!');
+  };
+
   render() {
-    const { ingredients, totalPrice, purchasable } = this.state;
+    const { ingredients, totalPrice, purchasable, purchasing } = this.state;
     const disabledInfo = { ...ingredients };
     for (let key in disabledInfo) {
       disabledInfo[key] = disabledInfo[key] <= 0;
-    };
+    }
 
     return (
       <React.Fragment>
+        <Modal modalClosed={this.cancelPurchaseModal} show={purchasing}>
+          <OrderSummary
+            price={totalPrice}
+            purchaseCancelled={this.cancelPurchaseModal}
+            purchaseContinued={this.continuePurchase}
+            ingredients={ingredients}
+          />
+        </Modal>
         <Burger ingredients={ingredients} />
         <BuildControls
+          ordered={this.showPurchasingModal}
           purchasable={purchasable}
           price={totalPrice}
           disabled={disabledInfo}
