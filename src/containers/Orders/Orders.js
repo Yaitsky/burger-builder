@@ -16,7 +16,7 @@ class Orders extends Component {
     axios
       .get('/orders.json')
       .then(({ data }) => {
-        const orders = Object.keys(data).map(id => ({ id, ...data[id] }));
+        const orders = data ? Object.keys(data).map(id => ({ id, ...data[id] })) : [];
         this.setState({ orders, loading: false });
       })
       .catch(error => {
