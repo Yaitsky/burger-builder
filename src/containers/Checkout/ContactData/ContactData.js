@@ -6,6 +6,8 @@ import Spinner from '../../../components/UI/Spinner/Spinner';
 import classes from './ContactData.css';
 import Input from '../../../components/UI/Input/Input';
 import axios from '../../../axios-orders';
+import withErrorHandler from '../../../hoc/withErrorHandler/withErrorHandler';
+import * as actions from '../../../store/actions';
 
 class ContactData extends Component {
   state = {
@@ -108,17 +110,7 @@ class ContactData extends Component {
       orderData
     };
 
-    axios
-      .post('/orders.json', data)
-      .then(response => {
-        this.setState({ loading: false });
-        this.props.history.push('/');
-        console.log(response);
-      })
-      .catch(error => {
-        this.setState({ loading: false });
-        console.log(error);
-      });
+    this.props.onPurchase(data);
   };
 
   checkValidity(value, rules) {
@@ -153,7 +145,8 @@ class ContactData extends Component {
   };
 
   render() {
-    const { loading, orderForm, isFormValid } = this.state;
+    const { orderForm, isFormValid } = this.state;
+    const { loading } = this.props;
     const formElementsArray = Object.keys(orderForm).map(name => (
       <Input
         key={name}
@@ -187,8 +180,13 @@ class ContactData extends Component {
 }
 
 const mapStateToProps = state => ({ 
-  ings: state.ingredients,
-  price: state.totalPrice
+  ings: state.bb.ingredients,
+  price: state.bb.totalPrice,
+  loading: state.order.loading
 });
 
-export default connect(mapStateToProps)(ContactData);
+const mapDispatchToProps = dispatch => ({
+  onPurchase: data => dispatch(actions.purchaseBurgerStart(data))
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(withErrorHandler(ContactData, axios));
