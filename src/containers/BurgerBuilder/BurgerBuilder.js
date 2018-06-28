@@ -28,7 +28,9 @@ class BurgerBuilder extends Component {
   };
 
   showPurchasingModal = () => {
-    this.setState({ purchasing: true });
+    const { isAuth, history } = this.props;
+    if (isAuth) this.setState({ purchasing: true });
+    else history.push('/auth');
   };
 
   cancelPurchaseModal = () => {
@@ -47,7 +49,8 @@ class BurgerBuilder extends Component {
       price,
       onIgredientAdded,
       onIgredientDeleted,
-      error
+      error,
+      isAuth
     } = this.props;
     const disabledInfo = { ...ings };
     for (let key in disabledInfo) {
@@ -67,6 +70,7 @@ class BurgerBuilder extends Component {
             disabled={disabledInfo}
             increase={onIgredientAdded}
             decrease={onIgredientDeleted}
+            isAuth={isAuth}
           />
         </React.Fragment>
       );
@@ -98,7 +102,8 @@ class BurgerBuilder extends Component {
 const mapStateToProps = state => ({
   ings: state.bb.ingredients,
   price: state.bb.totalPrice,
-  error: state.bb.error
+  error: state.bb.error,
+  isAuth: state.auth.token !== null
 });
 
 const mapDispatchToProps = dispatch => ({

@@ -99,6 +99,7 @@ class ContactData extends Component {
     e.preventDefault();
     this.setState({ loading: true });
     const { orderForm } = this.state;
+    const { token, onPurchase } = this.props;
     const orderData = Object.keys(orderForm).reduce(
       (value, next) => ({ ...value, [next]: orderForm[next].value }),
       {}
@@ -110,7 +111,7 @@ class ContactData extends Component {
       orderData
     };
 
-    this.props.onPurchase(data);
+    onPurchase(data, token);
   };
 
   checkValidity(value, rules) {
@@ -182,11 +183,12 @@ class ContactData extends Component {
 const mapStateToProps = state => ({ 
   ings: state.bb.ingredients,
   price: state.bb.totalPrice,
-  loading: state.order.loading
+  loading: state.order.loading,
+  token: state.auth.token
 });
 
 const mapDispatchToProps = dispatch => ({
-  onPurchase: data => dispatch(actions.purchaseBurgerStart(data))
+  onPurchase: (data, token) => dispatch(actions.purchaseBurgerStart(data, token))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(withErrorHandler(ContactData, axios));
